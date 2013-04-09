@@ -1,7 +1,7 @@
 {
   "name": "excel-errors",
-  "version": "0.0.1",
-  "description": "Web and node.js spreadsheet library. Supports xlsx, csv, tsv (or any simple delimited file) for now.",
+  "version": "0.0.2",
+  "description": "Web and node.js spreadsheet library. Forked from 'excel,' now with error handling.",
   "main": "excelParser.js",
   "dependencies": {
     "node-promise": "~0.5.3",
@@ -23,6 +23,5 @@
     "xlsx"
   ],
   "author": ["Trevor Dixon <trevordixon@gmail.com>","Jake Scott"],
-  "license": "MIT",
-  "private": true
+  "license": "MIT"
 }

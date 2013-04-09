@@ -101,7 +101,12 @@ function extractData(files) {
 
 module.exports = function parseXlsx(path, cb) {
 	extractFiles(path).then(function(files) {
-		cb(null, extractData(files));
+		try {
+			cb(null, extractData(files));
+		}
+		catch(err) {
+			cb(err);
+		}
 	},
 	function(err) {
 		cb(err);
