@@ -17,6 +17,7 @@ function extractFiles(path) {
 		}
 	};
 
+	var deferreds = [];
 	require('fs').createReadStream(path)
 		.pipe(unzip.Parse())
 		.on('error', function(err) {
@@ -24,19 +25,25 @@ function extractFiles(path) {
 		})
 		.on('entry', function(entry) {
 			if (files[entry.path]) {
+				deferreds.push(files[entry.path].deferred);
+
 				var contents = '';
 				entry.on('data', function(data) {
 					contents += data.toString();
-				}).on('end', function() {
+				})
+				.on('end', function() {
 					files[entry.path].contents = contents;
 					files[entry.path].deferred.resolve();
 				});
 			}
 		});
 
-	when(all(_.pluck(files, 'deferred')), function() {
-		deferred.resolve(files);
-	});
+	when(all(deferreds)).then(function() {
+			deferred.resolve(files);
+		},
+		function() {
+			deferred.reject('Couldn\'t extract files.');
+		});
 
 	return deferred.promise;
 }
