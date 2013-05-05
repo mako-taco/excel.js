@@ -10,14 +10,15 @@ function extractFiles(path) {
 
 	var files = {
 		'xl/worksheets/sheet1.xml': {
-			deferred: defer()
+			deferred: defer(),
+			okay: false
 		},
 		'xl/sharedStrings.xml': {
-			deferred: defer()
+			deferred: defer(),
+			okay: false
 		}
 	};
 
-	var deferreds = [];
 	require('fs').createReadStream(path)
 		.pipe(unzip.Parse())
 		.on('error', function(err) {
@@ -25,25 +26,31 @@ function extractFiles(path) {
 		})
 		.on('entry', function(entry) {
 			if (files[entry.path]) {
-				deferreds.push(files[entry.path].deferred);
-
 				var contents = '';
+				files[entry.path].okay = true;
 				entry.on('data', function(data) {
 					contents += data.toString();
-				})
-				.on('end', function() {
+				}).on('end', function() {
 					files[entry.path].contents = contents;
 					files[entry.path].deferred.resolve();
 				});
 			}
+		})
+		.on('end', function() {
+			for(i in files) {
+				if(!files[i].okay) {
+					files[i].deferred.reject('Bad file');
+				}
+			}
 		});
 
-	when(all(deferreds)).then(function() {
-			deferred.resolve(files);
-		},
-		function() {
-			deferred.reject('Couldn\'t extract files.');
-		});
+	when(all(_.pluck(files, 'deferred')), function() {
+		console.log("All resolved");
+		deferred.resolve(files);
+	}, function(err) {
+		console.log("All rejected");
+		deffered.reject(err);
+	});
 
 	return deferred.promise;
 }
