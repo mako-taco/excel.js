@@ -9,7 +9,7 @@
   ],
   "dependencies": {
     "node-promise": "~0.5.3",
-    "libxmljs": "*",
+    "libxmljs": ">=0.8.0",
     "underscore": "~1.3.3",
     "unzip": "~0.0.3"
   },
